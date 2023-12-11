@@ -12,57 +12,65 @@ from sklearn.linear_model import LinearRegression
 
 # Dictionary to store student information
 student_info = {
-    "A20405219070": {
-        "name": "Raj Kamal Chilakalapudi",
-        "enrollment_number": "A20405219070",
+    "O170111": {
+        "name": "Anuhya Velagaturi",
+        "id_number": "O170111",
         "branch": "CSE",
         "year": 4,
-        "batch": "2019-2023",
-        "image_path": "/root/kamal/kamal_face.jpg"
+        "batch": "2017-2023",
+        "image_path": "/root/anu/anuhya.jpg"
     },
-    "A20405219071": {
-        "name": "Ganagalla Vamsi",
-        "enrollment_number": "A20405219071",
+    "O170122": {
+        "name": "Vijaya Themmanaboina",
+        "id_number": "O170122",
         "branch": "CSE",
         "year": 4,
-        "batch": "2019-2023",
-        "image_path": "/root/kamal/vamsi_new.jpg"
+        "batch": "2017-2023",
+        "image_path": "/root/anu/vijaya.jpg"
     },
-    "A20405219025": {
-        "name": "PALURI NAVEEN",
-        "enrollment_number": "A20405219025",
+    "O170133": {
+        "name": "Kamakshi Godini",
+        "id_number": "O170133",
         "branch": "CSE",
         "year": 4,
-        "batch": "2019-2023",
-        "image_path": "/root/kamal/naveen_pic.jpg"
+        "batch": "2017-2023",
+        "image_path": "/root/anu/kamakshi.jpg"
+    }
+    "O170144": {
+        "name": "Anudeepthi Kolagani",
+        "id_number": "O170144",
+        "branch": "CSE",
+        "year": 4,
+        "batch": "2017-2023",
+        "image_path": "/root/anu/deepthi.jpg"
     }
     # Add more student information as needed
 }
 
-# Dictionary to store known face encodings and enrollment numbers
+# Dictionary to store known face encodings and id numbers
 known_faces = {}
 
 
 # Function to load and encode a student face
-def load_student_face(enrollment_number, image_path):
+def load_student_face(id_number, image_path):
     image = face_recognition.load_image_file(image_path)
     face_encoding = face_recognition.face_encodings(image)[0]
-    known_faces[enrollment_number] = face_encoding
+    known_faces[id_number] = face_encoding
 
 
-# Load known faces and their enrollment numbers
-for enrollment_number, student in student_info.items():
+# Load known faces and their id numbers
+for id_number, student in student_info.items():
     image_path = student["image_path"]
     if os.path.exists(image_path):
-        load_student_face(enrollment_number, image_path)
+        load_student_face(id_number, image_path)
     else:
-        print(f"Image file not found for enrollment number: {enrollment_number}")
+        print(f"Image file not found for id number: {id_number}")
 
 
 def get_audio():
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        print("Say something!")
+        print("Please say something!")
         audio = r.listen(source)
     try:
         text = r.recognize_google(audio)
@@ -85,7 +93,7 @@ def run_command(command):
 
 
 def display_header():
-    header = pyfiglet.figlet_format("MENU INTERFACE", font="slant")
+    header = pyfiglet.figlet_format("MENU PROGRAM", font="slant")
     print(header)
 
 
@@ -120,15 +128,15 @@ def detect_eyes():
 
 
 def match_face(face_encoding):
-    for enrollment_number, known_face_encoding in known_faces.items():
+    for id_number, known_face_encoding in known_faces.items():
         matches = face_recognition.compare_faces([known_face_encoding], face_encoding)
         if matches[0]:
-            return enrollment_number
+            return id_number
     return None
 
 
 def ml_interface():
-    print("Enter hours of study:")
+    print("Hors of study:")
     x = pd.read_csv('data.csv')
     a = x["hrs of study"]
     b = np.array(a)
@@ -143,17 +151,17 @@ def ml_interface():
 
 def main():
     display_header()
-    print("Choose a method to enter your command:")
+    print("Please choose any of the following options:")
     print("1. Type manually")
     print("2. Voice recognition")
-    choice = input("Enter your choice: ")
+    choice = input("Please enter your choice: ")
 
     while True:
         if choice == "1":
             print("""
-            Press x: for Linux commands
-            Press y: for eye detection
-            Press z: for attendance face detection
+            Press a: for attendance face detection
+            Press e: for eye detection
+            Press l: for Linux commands
             Press ML: to run ML code
             Press google: to search on Google
             Press youtube: to open YouTube
@@ -161,7 +169,7 @@ def main():
             """)
             command = input("Enter your choice: ")
             if command == "google":
-                search_term = input("What do you want to search for? ")
+                search_term = input("You want to search for? ")
                 url = "https://www.google.com/search?q=" + search_term
                 webbrowser.open_new_tab(url)
             elif command == "youtube":
@@ -171,7 +179,7 @@ def main():
                 print("The current time is:", current_time)
             elif command == "y":
                 detect_eyes()
-            elif command == "z":
+            elif command == "a":
                 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
                 video_capture = cv2.VideoCapture(0)
 
@@ -186,15 +194,15 @@ def main():
                         roi_color = frame[y:y + h, x:x + w]
 
                         face_encoding = face_recognition.face_encodings(frame)[0]
-                        enrollment_number = match_face(face_encoding)
+                        id_number = match_face(face_encoding)
 
-                        if enrollment_number:
-                            student = student_info[enrollment_number]
+                        if id_number:
+                            student = student_info[id_number]
                             cv2.rectangle(frame, (10, 10), (500, 220), (200, 200, 200), cv2.FILLED)
                             cv2.putText(frame, "MATCHED", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
                             cv2.putText(frame, f"Name: {student['name']}", (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                                         (0, 0, 0), 2)
-                            cv2.putText(frame, f"Enrollment No: {student['enrollment_number']}", (20, 110),
+                            cv2.putText(frame, f"ID No: {student['id_number']}", (20, 110),
                                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
                             cv2.putText(frame, f"Branch: {student['branch']}", (20, 140), cv2.FONT_HERSHEY_SIMPLEX,
                                         0.5, (0, 0, 0), 2)
@@ -213,22 +221,22 @@ def main():
 
             elif command == "ML":
                 ml_interface()
-            elif command == "x":
+            elif command == "l":
                 while True:
                     print("""
-                    Press 1: to run date command
-                    Press 2: to run docker commands
+                    Press date: to run date command
+                    Press docker: to run docker commands
                     Press cal: to print calendar
-                    Press docker images: to list docker images
+                    Press docker_images: to list docker images
                     Press ls: to list files
                     Press cd: to change directory
                     Press whoami: to get current user
-                    Press docker version: to get Docker version
+                    Press docker_version: to get Docker version
                     """)
                     subcommand = input("Enter your choice: ")
-                    if subcommand == "docker images":
+                    if subcommand == "docker_images":
                         run_command("docker images")
-                    elif subcommand == "docker version":
+                    elif subcommand == "docker_version":
                         run_command("docker --version")
                     elif subcommand == "ls":
                         run_command("ls")
@@ -240,13 +248,13 @@ def main():
                         run_command("cal")
                     elif subcommand == "whoami":
                         run_command("whoami")
-                    elif subcommand == "1":
+                    elif subcommand == "date":
                         run_command("date")
-                    elif subcommand == "2":
+                    elif subcommand == "docker":
                         print("""
-                        Press 1: to list all containers
-                        Press 2: to list running containers
-                        Press 3: to list stopped containers
+                        Press list: to list all containers
+                        Press rc: to list running containers
+                        Press sc: to list stopped containers
                         """)
                         docker_subcommand = input("Enter your choice: ")
                         if docker_subcommand == "1":
